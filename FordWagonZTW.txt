@@ -1,4 +1,4 @@
-Ford Focus Wagon ZTW 2014
+Ford,Focus Wagon ZTW,2014
 18445.0
 5
 Colour
@@ -15,20 +15,20 @@ Pitch Black Clearcoat,0
 Columbia Blue Matte,0
 Transmission
 2
-automatic,0
-standard,-815
+Automatic,0
+Standard,-815
 Brakes
 3
 ABS,400
 ABS with Advance Traction,1625
-standard,0
+Standard,0
 Side Impact Airbag
 2
-yes,350
-not,0
+Included,350
+Not Included,0
 Power Moonroof
 2
-yes,595
-no,0
+Included,595
+Not Included,0
 
 

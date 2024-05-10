@@ -1,152 +1,128 @@
 package Model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class OptionSet implements Serializable {
-	private String setName;
-	private Option[] op;
-	private int nextInsertPosition;
+    private String setName;
+    private ArrayList<Option> options;  // ArrayList to manage Option objects dynamically
 
-	public OptionSet() {
+    public OptionSet() {
+        this.options = new ArrayList<>();
+    }
+
+    public OptionSet(String setName) {
+        this.setName = setName;
+        this.options = new ArrayList<>();
+    }
+
+    // Accessor methods
+    protected String getSetName() {
+        return setName;
+    }
+
+    protected void setSetName(String setName) {
+        this.setName = setName;
+    }
+
+    protected ArrayList<Option> getOptions() {
+        return options;
+    }
+
+    protected Option getOption(int index) {
+        if (index >= 0 && index < options.size()) {
+            return options.get(index);
+        }
+        return null;  // Return null if index is out of bounds
+    }
+
+    protected void addOption(String name, float price) {
+        options.add(new Option(name, price));
+    }
+
+    protected boolean deleteOption(String optionName) {
+        return options.removeIf(option -> option.getOptionName().equalsIgnoreCase(optionName));
+    }
+
+    protected Option findOption(String optionName) {
+        for (Option option : options) {
+            if (option.getOptionName().equalsIgnoreCase(optionName)) {
+                return option;
+            }
+        }
+        return null;
+    }
+    protected Option getOptionChoice(int i) {
+		return this.options.get(i);
 	}
 
-	public OptionSet(String setName, int size) {
-		this.setName = setName;
-		op = new Option[size];
-		nextInsertPosition = 0;
+	protected void setOptionChoice(int i, String optionName) {
+		this.options.get(i).setOptionName(optionName);
 	}
 
-	protected String getSetName() {
-		return setName;
-	}
+    protected void updateOptionName(int index, String newName) {
+        if (index >= 0 && index < options.size()) {
+            options.get(index).setOptionName(newName);
+        }
+    }
 
-	protected void setSetName(String setName) {
-		this.setName = setName;
-	}
+    protected void updateOptionPrice(int index, float newPrice) {
+        if (index >= 0 && index < options.size()) {
+            options.get(index).setPrice(newPrice);
+        }
+    }
 
-	protected Option getOneOp(int i) {
-		return op[i];
-	}
+    // Printing and toString methods
+    public void print() {
+        System.out.println("OptionSet Name: " + setName);
+        for (Option option : options) {
+            option.print();
+        }
+    }
 
-	protected Option[] getOp() {
-		return op;
-	}
+    public String toString() {
+        StringBuilder sb = new StringBuilder("OptionSet Name: ").append(setName);
+        for (Option option : options) {
+            sb.append("\n").append(option);
+        }
+        return sb.toString();
+    }
 
-	protected void setOp(Option[] op) {
-		this.op = op;
-	}
+    public class Option implements Serializable {
+        private String name;
+        private float price;
 
-	protected int getOpLength() {
-		return op.length;
-	}
+        public Option() {
+        }
 
-	protected void buildOption(int x, String name, float price) {
+        public Option(String name, float price) {
+            this.name = name;
+            this.price = price;
+        }
 
-	}
+        protected String getOptionName() {
+            return name;
+        }
 
-	protected String getOpName(int i) {
-		return op[i].getName();
-	}
+        protected void setOptionName(String name) {
+            this.name = name;
+        }
 
-	protected void setOpName(int x, String newOpName) {
-		this.op[x].setName(newOpName);
-	}
+        protected float getPrice() {
+            return price;
+        }
 
-	protected float getOpPrice(int x) {
-		return op[x].getPrice();
-	}
+        protected void setPrice(float price) {
+            this.price = price;
+        }
 
-	protected void setOpPrice(int x, float newOpPrice) {
-		this.op[x].setPrice(newOpPrice);
-	}
+        public String toString() {
+            return "Option Name: " + name + ", Price: $" + price;
+        }
 
-	// addOption() adds new Option to the OptionSet
-	protected void addOption(Option option) {
-		op[nextInsertPosition] = option;
-		nextInsertPosition++;
-	}
-
-	// findOption() finds option by optionName in the Option set
-	protected Option findOption(String optionName) {
-		for (int i = 0; i < op.length; ++i) {
-			if (op[i].getName().equalsIgnoreCase(optionName)) {
-				op[i].print();
-				return op[i];
-			}
-		}
-		return null;
-	}
-
-	// deleteOption()
-	protected boolean deleteOption(String OptionName) {
-		Option foundOp = findOption(OptionName);
-		// if option not found, return false
-		if (foundOp == null)
-			return false;
-
-		Option[] newOptions = new Option[op.length - 1];
-		for (int i = 0; i < op.length - 1; ++i) {
-			if (op[i] != foundOp)
-				newOptions[i] = op[i];
-		}
-		op = newOptions;
-		return true;
-	}
-
-	protected void print() {
-		System.out.println(toString());
-	}
-
-	protected void printOneOption(int x) {
-
-	}
-
-	public String toString() {
-		StringBuffer stringBuffer = new StringBuffer();
-		stringBuffer.append("OptionSet Name: ").append(setName);
-		String str = stringBuffer.toString();
-		return str;
-	}
-
-	public class Option implements Serializable {
-		private String name;
-		private float price;
-
-		// constructors
-		public Option() {
-		}
-
-		public Option(String name, float price) {
-			this.name = name;
-			this.price = price;
-		}
-
-		protected String getName() {
-			return name;
-		}
-
-		protected void setName(String name) {
-			this.name = name;
-		}
-
-		protected float getPrice() {
-			return price;
-		}
-
-		protected void setPrice(float price) {
-			this.price = price;
-		}
-
-		public String toString() {
-			StringBuffer stringBuffer = new StringBuffer();
-			stringBuffer.append("Option Name: ").append(name).append(", Price: $").append(price);
-			String str = stringBuffer.toString();
-			return str;
-		}
-
-		// print() prints Option object's attributes
-		protected void print() {
-			System.out.println(toString());
-		}
-	}
+        protected void print() {
+            System.out.println(toString());
+        }
+    }
 }
+

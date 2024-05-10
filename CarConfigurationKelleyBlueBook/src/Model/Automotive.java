@@ -1,216 +1,187 @@
 package Model;
-
 import java.io.Serializable;
-
+import java.util.ArrayList;
 import Model.OptionSet.Option;
 
-public class Automotive implements Serializable { // class represents the model of the car
-	private String name;
+public class Automotive <Key,Value> implements Serializable {
+	// private String name;
+	private String make;
+	private String model;
+	private String year;
 	private float basePrice;
-	private OptionSet[] opset;
-	private int nextInsertPosition;
-	private Option[] op;
-	private int optionSetSize;
-
-	// default constructor
+	private ArrayList<OptionSet> optionSets;  // ArrayList to manage OptionSets
+	private ArrayList <Option> choice;
+	// Default constructor
 	public Automotive() {
+		this.optionSets = new ArrayList<>();
+		this.choice = new ArrayList<>();
 	}
 
-	// parameterized constructor
-	public Automotive(String name, float basePrice, int optionSetSize, int optionSize) {
-		this.name = name;
+	// Parameterized constructor
+	public Automotive(String make, String model, String year, float basePrice) {
+		this.make = make;
+		this.model = model;
+		this.year = year;
 		this.basePrice = basePrice;
-		opset = new OptionSet[optionSetSize];
-		op = new Option[optionSize];
-		nextInsertPosition = 0;
+		this.optionSets = new ArrayList<>();
+		this.choice = new ArrayList<>();
 	}
 
-	// getters
-	public String getName() {
-		return name;
+	//choice methods
+	public String getOptionChoice(String name) {
+		for (int i = 0; i < optionSets.size(); i++) {
+			OptionSet option = optionSets.get(i);
+			if (option.getSetName().equals(name)) {
+				return choice.get(i).getOptionName();
+			}
+		}
+		return null;
 	}
+
+	public float getOptionChoicePrice(String setName) {
+		for (int i = 0; i < optionSets.size(); i++) {
+			OptionSet o = optionSets.get(i);
+			if (o.getSetName().equals(setName)) {
+				return choice.get(i).getPrice();
+			}
+		}
+		System.out.printf("Error! Option set was not found");
+		return 0.0f;
+	}
+	public void setOptionChoice(String optionSetName, String optionName) {
+		for (int i = 0; i < optionSets.size(); i++) {
+			OptionSet ops = optionSets.get(i);
+			if (ops.getSetName().equals(optionSetName)) {
+				Option option = ops.findOption(optionName);
+				// Check if the index exists in the choices list; if not, expand it.
+				while (choice.size() <= i) {
+					choice.add(null);  // Ensure the list is big enough
+				}
+				choice.set(i, option);  
+				return;
+			}
+		}
+	}
+	public float getTotalPrice(){
+		float price = 0.0f;
+		for (int i = 0; i < choice.size(); i++)
+			price += choice.get(i).getPrice();
+		return price += this.basePrice;
+	}
+
+
+	//get methods
 
 	public float getBasePrice() {
 		return basePrice;
 	}
 
-	public OptionSet getOneOpset(int i) {
-		return opset[i];
+	public ArrayList<OptionSet> getOptionSets() {
+		return optionSets;
 	}
 
-	public OptionSet[] getOpset() {
-		return opset;
+	public OptionSet getOptionSet(int index) {
+		if (index >= 0 && index < optionSets.size()) {
+			return optionSets.get(index);
+		}
+		return null;
 	}
-
-	public int getOpsetLength() {
-		return opset.length;
+	public String getMake() {
+		return make;
 	}
-
-	public int getOpLength(int i) {
-		return opset[i].getOpLength();
+	public String getModel() {
+		return model;
+	}public String getYear() {
+		return year;
 	}
-
-	public String getOpsetName(int i) {
-		return opset[i].getSetName();
+	// Setters
+	public void setMake(String make) {
+		this.make = make;
 	}
-
-	public String getOpName(int x, int y) {
-		return opset[x].getOpName(y);
+	public void setModel(String model) {
+		this.model = model;
+	}public void setYear(String year) {
+		this.year = year;
 	}
-
-	public float getOpPrice(int x, int y) {
-		return opset[x].getOpPrice(y);
-	}
-
-	// setters
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public void setBasePrice(float basePrice) {
 		this.basePrice = basePrice;
 	}
 
-	public void setOpset(OptionSet[] opset) {
-		this.opset = opset;
+
+	public void addOptionSet(String setName) {
+		OptionSet newSet = new OptionSet(setName);
+		optionSets.add(newSet);
+		choice.add(null);  // Add a corresponding null entry to maintain index alignment
 	}
 
-	public void setOneOpsetLength(OptionSet set, int i) {
-		this.opset[i] = set;
+	public void setOptionSet(int index, OptionSet set) {
+		if (index >= 0 && index < optionSets.size()) {
+			optionSets.set(index, set);
+		}
 	}
 
-	public void setOpSetName(int i, String setName) {
-		this.opset[i].setSetName(setName);
+	// Methods to manipulate options within option sets
+	public void updateOptionSet(String setName, int numOptions) {
+		OptionSet set = new OptionSet(setName);
+		for (int i = 0; i < numOptions; i++) {
+			set.addOption("Option " + (i + 1), 0.0f);  // Default options
+		}
+		optionSets.add(set);
 	}
 
-	public void setOpName(int x, int y, String opName) {
-		this.opset[x].setOpName(y, opName);
-	}
-
-	public void setOpPrice(int x, int y, float opPrice) {
-		this.opset[x].setOpPrice(y, opPrice);
-	}
-
-	public void setOneOptionSetOption(int x, int y, String name, float price) {
-		this.opset[x].buildOption(y, name, price);
-	}
-	public void setOpSetLength(int optionSetSize) {
-		this.optionSetSize=optionSetSize;
-	}
-	
-	
-	
-	
-	
-	// addOptionSet() adds optionSet in the optionSet array
-	public void updateOptionSet(String str, int length) {
-		OptionSet optset = new OptionSet(str, length);
-		opset[nextInsertPosition] = optset;
-		nextInsertPosition++;
-	}
-
-	public void updateOptionPrice(String optionname, float price) {
-	    for (int i = 0; i < opset.length; i++) {
-	        Option[] options = opset[i].getOp(); // Get the options for the current OptionSet
-	        for (int j = 0; j < options.length; j++) {
-	            if (options[j].getName().equals(optionname)) {
-	                options[j].setPrice(price); // Update the price of the matching option
-	                return; // Exit the loop once the option is found and updated
-	            }
-	        }
-	    }
-	}
-
-	// addOption() adds option in the required OptionSet.
 	public void updateOption(String optionSetName, String optionName, float price) {
-		for (int i = 0; i < opset.length; ++i) {
-			OptionSet.Option opt = opset[i].new Option();
-			if (opset[i].getSetName() == optionSetName) {
-				opt.setName(optionName);
-				opt.setPrice(price);
-				opset[i].addOption(opt);
+		for (OptionSet set : optionSets) {
+			if (set.getSetName().equals(optionSetName)) {
+				set.addOption(optionName, price);
 				break;
 			}
 		}
 	}
 
-	// findOptionSet() searches for the required optionSet using optionSetName
-	// and returns OptionSet object if found else null.
-	public OptionSet findOptionSet(String optionSetName) {
-		for (int i = 0; i < opset.length; ++i) {
-			if (opset[i].getSetName().equalsIgnoreCase(optionSetName)) {
-				opset[i].print();
-				return opset[i];
+	public void updateOptionPrice(String optionName, float price) {
+		for (OptionSet set : optionSets) {
+			Option option = set.findOption(optionName);
+			if (option != null) {
+				option.setPrice(price);
+				break;
 			}
 		}
-		return null;
 	}
-
-	// findOption() searches for the option in the required optionSet using
-	// optionName and returns option object if found else null.
-	public OptionSet.Option findOption(String optionSetName, String optionName) {
-		for (int i = 0; i < opset.length; ++i) {
-			if (opset[i].getSetName().equalsIgnoreCase(optionSetName)) {
-				return opset[i].findOption(optionName);
-			}
-		}
-		return null;
-	}
-
-	// deleteOptionSet() deletes the required optionset from the option set
-	// array
-	public boolean deleteOptionSet(String optionSetName) {
-		OptionSet foundOpSet = findOptionSet(optionSetName);
-		if (foundOpSet == null)
-			return false;
-
-		OptionSet[] newOptset = new OptionSet[opset.length - 1];
-		for (int j = 0; j < opset.length - 1; ++j) {
-			if (opset[j] != foundOpSet) {
-				newOptset[j] = opset[j];
-			}
-		}
-		opset = newOptset;
-		return true;
-	}
-
-	// deleteOption() deletes the required option from the optionSetArray
-	public boolean deleteOption(String optionSetName, String optionName) {
-		OptionSet opset = findOptionSet(optionSetName);
-		if (opset != null) {
-			return opset.deleteOption(optionName);
-		}
-		return false;
-	}
-	public boolean updateOptionSetName(String OptionSetName, String newOptionSetName) {
-		OptionSet name = findOptionSet(OptionSetName);
-		if (name != null) {
-			name.setSetName(newOptionSetName);
+	public boolean updateOptionSetName(String oname, String nname) {
+		int index = this.findOptionSet(oname);
+		if (index != -1) {
+			this.optionSets.get(index).setSetName(nname);
 			return true;
 		}
 		return false;
 	}
-	
 
-	// toString() converts buffered string to a string
-	public String toString() {
-		StringBuffer stringBuffer = new StringBuffer();
-		stringBuffer.append("Automotive Name: ").append(name).append("\nBase Price: $").append(basePrice);
-		String str = stringBuffer.toString();
-		return str;
+	public int findOptionSet(String name) {
+		for (int i = 0; i < this.optionSets.size(); i++) {
+			if (optionSets.get(i).getSetName().equals(name)) {
+				return i;
+			}
+		}
+		System.out.printf("\nOption Set not found!\n");
+		return -1;
 	}
 
-	// print() prints automotive object's attributes
-	// print() prints automotive object's attributes
+	// printing 
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Automotive Name: ").append(make).append(" ").append(model).append(" ").append(year).append("\nBase Price: $").append(basePrice);
+		return sb.toString();
+	}
+
 	public void print() {
-		System.out.println(toString());
-		for (int i = 0; i < opset.length; ++i) {
-			opset[i].print(); // Print option set name
-			for (int j = 0; j < opset[i].getOpLength(); ++j) {
-				System.out.println(
-						"Option " + (j + 1) + ": " + opset[i].getOpName(j) + ", Price: $" + opset[i].getOpPrice(j));
+		System.out.println(this);
+		for (OptionSet set : optionSets) {
+			System.out.println("Option Set Name: " + set.getSetName());
+			for (OptionSet.Option opt : set.getOptions()) {
+				System.out.println("Option: " + opt.getOptionName() + ", Price: $" + opt.getPrice());
 			}
 		}
 	}
-
 }
+
+

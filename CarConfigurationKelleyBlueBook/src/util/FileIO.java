@@ -13,86 +13,86 @@ import Model.Automotive;
 import exception.AutoException;
 import exception.Fix1to100;
 
+public class FileIO {
 
+	// Read a file and store its attributes in an Automotive object
+	public Automotive buildAutoObject(String fileName) throws AutoException {
+		Fix1to100 fixer = new Fix1to100();
+		Automotive automotive = null;
 
-    // read a file and store its attributes in Automotive object
-	public class FileIO {
+		try (BufferedReader buff = new BufferedReader(new FileReader(fileName))) {
+			// Read make, model, and year from the file
+			String makeModelYearLine = buff.readLine();
+			if (makeModelYearLine == null) throw new AutoException("File is empty");
+			String[] makeModelYearParts = makeModelYearLine.split(",");
+			if (makeModelYearParts.length < 3) {
+				throw new AutoException("Incomplete vehicle information in file.");
+			}
+			String make = makeModelYearParts[0].trim();
+			String model = makeModelYearParts[1].trim();
+			String year = makeModelYearParts[2].trim();
 
-	    // read a file and store its attributes in Automotive object
-	    public Automotive buildAutoObject(String fileName) throws AutoException {
-	        Automotive automotive = null;
-	        Fix1to100 fixer = new Fix1to100();
-	        
-	        while (true) {
-	            int optionSetCount = 0;
-	            int optionCount = 0;
+			// Read base price
+			float basePrice;
+			try {
+				basePrice = Float.parseFloat(buff.readLine());
+			} catch (NumberFormatException e) {
+				System.out.println("There is no base price defined.");
+				basePrice = (float) fixer.fix5(5); // Handle missing base price
+			}
 
-	            try (BufferedReader buff = new BufferedReader(new FileReader(fileName))) {
-	                String modelName = buff.readLine();
-	                float basePrice;
-	                
-	                try {
-	                basePrice = Float.parseFloat(buff.readLine());
-	                }
-	                catch(NumberFormatException e) { //fix issue if there is no base price
-	                	System.out.printf("There is no base price defined.");
-	                	basePrice = (Float) fixer.fix5(5);
-	                }
+			// Initialize Automotive
+			automotive = new Automotive(make, model, year, basePrice);
 
-	                // Attempt to read option set count
-	                String optionSetCountStr = buff.readLine();
-	                try {
-	                    optionSetCount = Integer.parseInt(optionSetCountStr);
-	                } catch (NumberFormatException e) {
-	                    System.out.println("Error: Invalid option set count.");
-	                    optionSetCount = (int) fixer.fix2(2); // fix2 fixes invalid option set count
-	                }
+			// Read option set count
+			int optionSetCount;
+			try {
+				optionSetCount = Integer.parseInt(buff.readLine());
+			} catch (NumberFormatException e) {
+				System.out.println("Error: Invalid option set count.");
+				optionSetCount = (int) fixer.fix2(2); // Handle invalid option set count
+			}
 
-	                automotive = new Automotive(modelName, basePrice, optionSetCount, optionCount);
+			// Process each OptionSet
+			for (int i = 0; i < optionSetCount; i++) {
+				String optionSetName = buff.readLine();
+				automotive.addOptionSet(optionSetName);  // Ensure this method exists to add a new OptionSet by name
 
-	                // Process option sets and options
-	                for (int i = 0; i < optionSetCount; i++) {
-	                    String optionSetName = buff.readLine();
-	                    try {
-	                        optionCount = Integer.parseInt(buff.readLine());
-	                    } catch (NumberFormatException e) {
-	                        System.out.println("Error: Invalid option count.");
-	                        optionCount = (int) fixer.fix3(3); // fix3 fixes invalid option count
-	                    }
-	                    catch (NoSuchElementException e) {
-	                    	 System.out.println("Error: Invalid option count.");
-		                        optionCount = (int) fixer.fix3(3); // fix3 fixes invalid option count
-	                    }
+				// Read option count
+				int optionCount;
+				try {
+					optionCount = Integer.parseInt(buff.readLine());
+				} catch (NumberFormatException | NoSuchElementException e) {
+					System.out.println("Error: Invalid option count.");
+					optionCount = (int) fixer.fix3(3); // Handle invalid option count with fix3
+				}
 
-	                    automotive.updateOptionSet(optionSetName, optionCount);
+				// Process each Option within this OptionSet
+				for (int j = 0; j < optionCount; j++) {
+					String[] optionInfo = buff.readLine().split(",");
+					if (optionInfo.length < 2) {
+						System.out.println("Error: Incomplete option details.");
+						continue; // Skip this iteration if the data is incomplete
+					}
+					String optionName = optionInfo[0].trim();
+					float optionPrice;
+					try {
+						optionPrice = Float.parseFloat(optionInfo[1]);
+					} catch (NumberFormatException e) {
+						System.out.println("Error -- Please enter the price manually for " + optionInfo[0]);
+						optionPrice = (float) fixer.fix1(1); // Handle missing price
+					}
 
-	                    for (int j = 0; j < optionCount; j++) {
-	                        String[] optionInfo = buff.readLine().split(",");
-	                        String optionName = optionInfo[0];
-	                        float optionPrice;
-	                        try {
-	                            optionPrice = Float.parseFloat(optionInfo[1]);
-	                        } catch (NumberFormatException e) {
-	                            System.out.println("Error -- Please enter the price manually for " + optionInfo[0]);
-	                            optionPrice = (Float) fixer.fix1(1); // fix1 number 1 corresponds to missing price
-	                        }
+					automotive.updateOption(optionSetName, optionName, optionPrice);  // add and update operations
+				}
+			}
+		} catch (IOException e) {
+			System.out.println("Error -- " + e.toString());
+			throw new AutoException("Failed to read file: " + fileName);
+		}
 
-	                        automotive.updateOption(optionSetName, optionName, optionPrice);
-	                    }
-	                }
+		return automotive;
 
-	                // If all data is successfully read, break the loop
-	                break;
-
-	            } catch (IOException e) {
-	                // Handle invalid file name error
-	                System.out.println("Error -- " + e.toString());
-	                fileName = (String) fixer.fix4(4);
-	            }
-	        }
-
-	        return automotive;
-	    
 	}
 
 
@@ -118,5 +118,5 @@ import exception.Fix1to100;
 		return automotive;
 	}
 
-	
+
 }

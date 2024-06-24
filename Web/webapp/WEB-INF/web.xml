@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee 
+         http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" 
+         version="3.1">
+
+    <display-name>Car Configuration Project</display-name>
+    
+    <!-- Model Servlet -->
+    <servlet>
+        <servlet-name>ModelServlet</servlet-name>
+        <servlet-class>com.servlet.ModelServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ModelServlet</servlet-name>
+        <url-pattern>/ModelServlet</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Configure Servlet -->
+    <servlet>
+        <servlet-name>ConfigureServlet</servlet-name>
+        <servlet-class>com.servlet.ConfigureServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ConfigureServlet</servlet-name>
+        <url-pattern>/ConfigureServlet</url-pattern>
+    </servlet-mapping>
+
+    <!-- Calculate Price Servlet -->
+	<servlet>
+	    <servlet-name>CalculatePriceServlet</servlet-name>
+	    <servlet-class>com.servlet.CalculatePriceServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+	    <servlet-name>CalculatePriceServlet</servlet-name>
+	    <url-pattern>/CalculatePriceServlet</url-pattern>
+	</servlet-mapping>
+
+    <!-- Welcome File List -->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
+</web-app>
